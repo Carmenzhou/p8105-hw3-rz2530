@@ -7,6 +7,10 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(rnoaa)
+library(ggridges)
+library(patchwork)
+
 library(p8105.datasets)
 knitr::opts_chunk$set(
 	fig.width = 6, 
@@ -85,8 +89,7 @@ instacart %>%
 ##load and clean data
 
 ```{r}
-accelerometer =
-  read_csv(here::here("data/accel_data.csv"))
+accelerometer = read_csv("./data/accel_data.csv")
 ```
 
 
