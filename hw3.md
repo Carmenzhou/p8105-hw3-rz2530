@@ -105,7 +105,7 @@ instacart %>%
 
 # Problem 2
 
-\#\#load and clean data
+\#\#Load and clean data
 
 ``` r
 accel = 
@@ -132,7 +132,7 @@ accel =
   mutate(weekend_vs_weekday = as.factor(weekend_vs_weekday),
          day = forcats::fct_relevel(day,c("Monday","Tuesday","Wednesday","Thursday",
                                      "Friday", "Saturday","Sunday"))) %>% 
-  group_by(week) %>% 
+  group_by(week,day) %>% 
   arrange(day,.by_group = T) %>% 
   relocate(day_id, week, weekend_vs_weekday)
 ```
@@ -150,7 +150,7 @@ accel
 ```
 
     ## # A tibble: 50,400 x 8
-    ## # Groups:   week [5]
+    ## # Groups:   week, day [35]
     ##    day_id week  weekend_vs_weekd… day    minute number_of_activ… weekend weekday
     ##    <fct>  <chr> <fct>             <fct>   <dbl>            <dbl> <lgl>   <lgl>  
     ##  1 2      1     weekday           Monday      1                1 FALSE   TRUE   
@@ -174,3 +174,26 @@ relocate the data and make it more readable. Finally, this dataset has
 50400 rows and 8 columns, with variables day\_id, week,
 weekend\_vs\_weekday, day, minute, number\_of\_activity, weekend,
 weekday.
+
+## Traditinal analysis
+
+``` r
+accel %>% 
+  summarize(total_activity = sum(number_of_activity)) %>% 
+  pivot_wider(names_from = week,
+              values_from = total_activity,
+              names_prefix = "week") %>% 
+  knitr::kable()
+```
+
+    ## `summarise()` regrouping output by 'week' (override with `.groups` argument)
+
+| day       |     week1 |  week2 |  week3 |  week4 |  week5 |
+| :-------- | --------: | -----: | -----: | -----: | -----: |
+| Monday    |  78828.07 | 295431 | 685910 | 409450 | 389080 |
+| Tuesday   | 307094.24 | 423245 | 381507 | 319568 | 367824 |
+| Wednesday | 340115.01 | 440962 | 468869 | 434460 | 445366 |
+| Thursday  | 355923.64 | 474048 | 371230 | 340291 | 549658 |
+| Friday    | 480542.62 | 568839 | 467420 | 154049 | 620860 |
+| Saturday  | 376254.00 | 607175 | 382928 |   1440 |   1440 |
+| Sunday    | 631105.00 | 422018 | 467052 | 260617 | 138421 |

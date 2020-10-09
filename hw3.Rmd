@@ -86,7 +86,7 @@ instacart %>%
 
 # Problem 2
 
-##load and clean data
+##Load and clean data
 
 ```{r}
 accel = 
@@ -113,13 +113,24 @@ accel =
   mutate(weekend_vs_weekday = as.factor(weekend_vs_weekday),
          day = forcats::fct_relevel(day,c("Monday","Tuesday","Wednesday","Thursday",
                                      "Friday", "Saturday","Sunday"))) %>% 
-  group_by(week) %>% 
+  group_by(week,day) %>% 
   arrange(day,.by_group = T) %>% 
   relocate(day_id, week, weekend_vs_weekday)
 
 accel
 ```
 First, we read data from "accel_data.csv" and clean it. Since the data in the excel is in a format that hard to read, I used pivot_longer and count the number of activities of different time length. And then drop null values and mutate the format of some variables for calculation. Then we create weekend_vs_weekday column. The last step is to group, relocate the data and make it more readable. Finally, this dataset has `r nrow(accel)` rows and `r ncol(accel)` columns, with variables day_id, week, weekend_vs_weekday, day, minute, number_of_activity, weekend, weekday.
+
+## Traditinal analysis
+```{r}
+accel %>% 
+  summarize(total_activity = sum(number_of_activity)) %>% 
+  pivot_wider(names_from = week,
+              values_from = total_activity,
+              names_prefix = "week") %>% 
+  knitr::kable()
+```
+
 
 
 
