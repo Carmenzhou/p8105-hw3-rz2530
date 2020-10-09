@@ -155,6 +155,45 @@ accel %>%
 ```
 Based on this graph, we can see that everyday, activities usually start increasing form 6am. And until around 10am, it reaches its peak. The amount of activity done on evening is usually larger than on the afternoon. On Friday, there is a peak time at 9pm.
 
+# Problem 3
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
+
+## Tidy data
+```{r}
+nynoaa_tidy = ny_noaa %>% 
+  mutate_at(vars(prcp, tmax, tmin, snow), as.numeric) %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate_at(vars(month),as.numeric) %>% 
+  mutate(month = month.name[month])
+
+nynoaa
+```
+```{r}
+sum(is.na(nynoaa$prcp))/nrow(nynoaa)
+sum(is.na(nynoaa$snow))/nrow(nynoaa)
+sum(is.na(nynoaa$snwd))/nrow(nynoaa)
+sum(is.na(nynoaa$tmax))/nrow(nynoaa)
+sum(is.na(nynoaa$tmin))/nrow(nynoaa)
+```
+
+This dataset has `r nrow(nynoaa)` rows and `r ncol(nynoaa)` columns. It starts from 1981-01-01 to 2010-12-31, containing the weather infomation of these days, including prcp, snow, snwd, tmax, and tmin. In tmax and tmin, the proportion of missing value is up to 43%, which is very high.
+
+## Snow data
+```{r}
+nynoaa_tidy %>% 
+  count(snow, na.rm = T) %>% 
+  mutate(rank = min_rank(desc(n)))
+```
+The most commonly observed value is 0 for snow, since usually there is no snow.
+
+## Make a two-panel plot showing the average max temperature in January and in July in each station across years
+```{r}
+
+```
 
 
 
