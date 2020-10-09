@@ -265,7 +265,41 @@ nynoaa_tidy = ny_noaa %>%
   separate(date, into = c("year", "month", "day"), sep = "-") %>% 
   mutate_at(vars(month),as.numeric) %>% 
   mutate(month = month.name[month])
+skimr::skim_without_charts(nynoaa_tidy)
 ```
+
+|                                                  |              |
+| :----------------------------------------------- | :----------- |
+| Name                                             | nynoaa\_tidy |
+| Number of rows                                   | 2595176      |
+| Number of columns                                | 9            |
+| \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_   |              |
+| Column type frequency:                           |              |
+| character                                        | 4            |
+| numeric                                          | 5            |
+| \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ |              |
+| Group variables                                  | None         |
+
+Data summary
+
+**Variable type: character**
+
+| skim\_variable | n\_missing | complete\_rate | min | max | empty | n\_unique | whitespace |
+| :------------- | ---------: | -------------: | --: | --: | ----: | --------: | ---------: |
+| id             |          0 |              1 |  11 |  11 |     0 |       747 |          0 |
+| year           |          0 |              1 |   4 |   4 |     0 |        30 |          0 |
+| month          |          0 |              1 |   3 |   9 |     0 |        12 |          0 |
+| day            |          0 |              1 |   2 |   2 |     0 |        31 |          0 |
+
+**Variable type: numeric**
+
+| skim\_variable | n\_missing | complete\_rate |   mean |     sd |    p0 |  p25 | p50 | p75 |  p100 |
+| :------------- | ---------: | -------------: | -----: | -----: | ----: | ---: | --: | --: | ----: |
+| prcp           |     145838 |           0.94 |  29.82 |  78.18 |     0 |    0 |   0 |  23 | 22860 |
+| snow           |     381221 |           0.85 |   4.99 |  27.22 |  \-13 |    0 |   0 |   0 | 10160 |
+| snwd           |     591786 |           0.77 |  37.31 | 113.54 |     0 |    0 |   0 |   0 |  9195 |
+| tmax           |    1134358 |           0.56 | 139.80 | 111.42 | \-389 |   50 | 150 | 233 |   600 |
+| tmin           |    1134420 |           0.56 |  30.29 | 104.00 | \-594 | \-39 |  33 | 111 |   600 |
 
 ``` r
 sum(is.na(nynoaa_tidy$prcp))/nrow(nynoaa_tidy)
@@ -330,34 +364,112 @@ no snow.
 
 ## Make a two-panel plot showing the average max temperature in January and in July in each station across years
 
+\#\#\#January
+
 ``` r
+january=
 nynoaa_tidy %>% 
   filter(month == 'January') %>% 
   group_by(id,month,year) %>% 
   summarise(max_mean = mean(tmax, na.rm = TRUE),.groups = 'drop') %>% 
   drop_na() %>% 
-  ggplot(aes(x = year, y = max_mean, color = id)) +
-  geom_point(alpha = 0.3, size = 0.2) +
-  geom_path(aes(group = id), alpha = 0.3, size = 0.2)
+  ggplot(aes(x = year,
+             y = max_mean,
+             color = id,
+             group = id))+
+  geom_point(alpha = 0.3)+
+  geom_path(alpha = 0.3)+
+  theme(legend.position = 'none',
+        axis.title.x = element_blank())+
+  labs(
+    x = "Year",
+    y = "Temperature",
+    title = "Maximun temperature in January of each years"
+    )
 ```
 
-<img src="hw3_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+\#\#\#July
 
 ``` r
-nynoaa_tidy %>% filter(id == 'US1NYAB0001',month == "January", year == "2008")
+july=
+nynoaa_tidy %>% 
+  filter(month == 'July') %>% 
+  group_by(id,month,year) %>% 
+  summarise(max_mean = mean(tmax, na.rm = TRUE),.groups = 'drop') %>% 
+  drop_na() %>% 
+  ggplot(aes(x = year,
+             y = max_mean,
+             color = id,
+             group = id))+
+  geom_point(alpha = 0.3)+
+  geom_path(alpha = 0.3)+
+  theme(legend.position = 'none',
+        axis.title.x = element_blank())+
+  labs(
+    x = "Year",
+    y = "Temperature",
+    title = "Maximun temperature in July of each years"
+    )
 ```
 
-    ## # A tibble: 31 x 9
-    ##    id          year  month   day    prcp  snow  snwd  tmax  tmin
-    ##    <chr>       <chr> <chr>   <chr> <dbl> <dbl> <int> <dbl> <dbl>
-    ##  1 US1NYAB0001 2008  January 01        0     0   343    NA    NA
-    ##  2 US1NYAB0001 2008  January 02       86   109   445    NA    NA
-    ##  3 US1NYAB0001 2008  January 03        0     0   432    NA    NA
-    ##  4 US1NYAB0001 2008  January 04        0     0    NA    NA    NA
-    ##  5 US1NYAB0001 2008  January 05        0     0   305    NA    NA
-    ##  6 US1NYAB0001 2008  January 06        0     0   267    NA    NA
-    ##  7 US1NYAB0001 2008  January 07        0     0   191    NA    NA
-    ##  8 US1NYAB0001 2008  January 08        0     0    89    NA    NA
-    ##  9 US1NYAB0001 2008  January 09        0     0    38    NA    NA
-    ## 10 US1NYAB0001 2008  January 10        0     0     0    NA    NA
-    ## # … with 21 more rows
+``` r
+january/july
+```
+
+<img src="hw3_files/figure-gfm/unnamed-chunk-16-1.png" width="90%" /> \*
+Overall temperature in July is higher than in January in NYC.
+Temperature in January is around -100 to 100, and in July, it is from
+around 200 to 300. \* There are many outliers for both datasets. For
+example, 1982 and 2005 had much lower temperature on January, 1988 had
+much lower temperature on July.
+
+\#\#Make a two-panel plot showing (i) tmax vs tmin for the full dataset
+(note that a scatterplot may not be the best option)
+
+``` r
+tmax_vs_tmin = 
+  nynoaa_tidy %>% 
+  drop_na(tmax, tmin) %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "tmax_vs_tmin",
+    values_to = "temperature"
+  ) %>% 
+  ggplot(aes(x = year, y = temperature)) +
+  geom_boxplot(aes(color = tmax_vs_tmin), alpha = 0.3)+
+
+  labs(
+    x = "Year",
+    y = "Temperature",
+    title = "tmax vs tmin"
+    )
+tmax_vs_tmin
+```
+
+<img src="hw3_files/figure-gfm/unnamed-chunk-17-1.png" width="90%" />
+
+## make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+``` r
+snow = 
+  nynoaa_tidy %>% 
+  filter(snow > 0, snow < 100) %>% 
+  ggplot(aes(x = year,y=snow)) +
+  geom_violin(scale = 'area') +
+  labs(title = "Snowfall of each year",
+       x = "Year",
+       y = "Snowfall"
+    )
+snow
+```
+
+<img src="hw3_files/figure-gfm/unnamed-chunk-18-1.png" width="90%" />
+
+``` r
+tmax_vs_tmin/snow
+```
+
+<img src="hw3_files/figure-gfm/unnamed-chunk-19-1.png" width="90%" /> \*
+From the boxplot of tmin vs tmax, each year’s temperature seems
+constant. \* The snowfall disribution of each year is also similar
+without much fluctuation.

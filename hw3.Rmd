@@ -267,6 +267,28 @@ tmax_vs_tmin =
 tmax_vs_tmin
 ```
 
+## make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+```{r}
+snow = 
+  nynoaa_tidy %>% 
+  filter(snow > 0, snow < 100) %>% 
+  ggplot(aes(x = year,y=snow)) +
+  geom_violin(scale = 'area') +
+  labs(title = "Snowfall of each year",
+       x = "Year",
+       y = "Snowfall"
+    )
+snow
+
+```
+
+```{r}
+tmax_vs_tmin/snow
+```
+* From the boxplot of tmin vs tmax, each year's temperature seems constant.
+* The snowfall disribution of each year is also similar without much fluctuation.
+
 
 
 
