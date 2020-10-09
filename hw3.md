@@ -197,3 +197,53 @@ accel %>%
 | Friday    | 480542.62 | 568839 | 467420 | 154049 | 620860 |
 | Saturday  | 376254.00 | 607175 | 382928 |   1440 |   1440 |
 | Sunday    | 631105.00 | 422018 | 467052 | 260617 | 138421 |
+
+Trend: People are having significantly less activity on Saturday,
+especially on week 4 and week 5.
+
+## Single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week.
+
+``` r
+accel
+```
+
+    ## # A tibble: 50,400 x 8
+    ## # Groups:   week, day [35]
+    ##    day_id week  weekend_vs_weekd… day    minute number_of_activ… weekend weekday
+    ##    <fct>  <chr> <fct>             <fct>   <dbl>            <dbl> <lgl>   <lgl>  
+    ##  1 2      1     weekday           Monday      1                1 FALSE   TRUE   
+    ##  2 2      1     weekday           Monday      2                1 FALSE   TRUE   
+    ##  3 2      1     weekday           Monday      3                1 FALSE   TRUE   
+    ##  4 2      1     weekday           Monday      4                1 FALSE   TRUE   
+    ##  5 2      1     weekday           Monday      5                1 FALSE   TRUE   
+    ##  6 2      1     weekday           Monday      6                1 FALSE   TRUE   
+    ##  7 2      1     weekday           Monday      7                1 FALSE   TRUE   
+    ##  8 2      1     weekday           Monday      8                1 FALSE   TRUE   
+    ##  9 2      1     weekday           Monday      9                1 FALSE   TRUE   
+    ## 10 2      1     weekday           Monday     10                1 FALSE   TRUE   
+    ## # … with 50,390 more rows
+
+``` r
+accel %>% 
+  group_by(day_id,day,minute) %>% 
+  summarize(total_activity = sum(number_of_activity)) %>%
+  ggplot(aes(x = minute, y = total_activity, color = day)) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "24-hour activity time counts for each day"
+    )+
+  scale_y_continuous(trans = "sqrt",
+                     name = "Activities",
+                     breaks = c(50,100,150,200,250,300,350,400))+
+  scale_x_continuous(name = "Hour",
+                     breaks = c(60,120,180, 240,300, 360,420, 480,540, 600,660, 720,780, 840,900, 960,1020, 1080,1140, 1200,1260, 1320,1380, 1440),
+                     labels = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24))
+```
+
+    ## `summarise()` regrouping output by 'day_id', 'day' (override with `.groups` argument)
+
+    ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+
+<img src="hw3_files/figure-gfm/unnamed-chunk-9-1.png" width="90%" />
+Based on this graph, we can see that everyday, activities usually start
+increasing form 7am

@@ -130,6 +130,33 @@ accel %>%
               names_prefix = "week") %>% 
   knitr::kable()
 ```
+Trend: People are having significantly less activity on Saturday, especially on week 4 and week 5.
+
+## Single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week.
+```{r}
+accel
+```
+```{r}
+accel %>% 
+  group_by(day_id,day,minute) %>% 
+  summarize(total_activity = sum(number_of_activity)) %>%
+  ggplot(aes(x = minute, y = total_activity, color = day)) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "24-hour activity time counts for each day"
+    )+
+  scale_y_continuous(trans = "sqrt",
+                     name = "Activities",
+                     breaks = c(50,100,150,200,250,300,350,400))+
+  scale_x_continuous(name = "Hour",
+                     breaks = c(60,120,180, 240,300, 360,420, 480,540, 600,660, 720,780, 840,900, 960,1020, 1080,1140, 1200,1260, 1320,1380, 1440),
+                     labels = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24))
+  
+```
+Based on this graph, we can see that everyday, activities usually start increasing form 6am. And until around 10am, it reaches its peak. The amount of activity done on evening is usually larger than on the afternoon. On Friday, there is a peak time at 9pm.
+
+
+
 
 
 
