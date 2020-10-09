@@ -246,4 +246,118 @@ accel %>%
 
 <img src="hw3_files/figure-gfm/unnamed-chunk-9-1.png" width="90%" />
 Based on this graph, we can see that everyday, activities usually start
-increasing form 7am
+increasing form 6am. And until around 10am, it reaches its peak. The
+amount of activity done on evening is usually larger than on the
+afternoon. On Friday, there is a peak time at 9pm.
+
+# Problem 3
+
+``` r
+library(p8105.datasets)
+data("ny_noaa")
+```
+
+## Tidy data
+
+``` r
+nynoaa_tidy = ny_noaa %>% 
+  mutate_at(vars(prcp, tmax, tmin, snow), as.numeric) %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate_at(vars(month),as.numeric) %>% 
+  mutate(month = month.name[month])
+```
+
+``` r
+sum(is.na(nynoaa_tidy$prcp))/nrow(nynoaa_tidy)
+```
+
+    ## [1] 0.0561958
+
+``` r
+sum(is.na(nynoaa_tidy$snow))/nrow(nynoaa_tidy)
+```
+
+    ## [1] 0.146896
+
+``` r
+sum(is.na(nynoaa_tidy$snwd))/nrow(nynoaa_tidy)
+```
+
+    ## [1] 0.2280331
+
+``` r
+sum(is.na(nynoaa_tidy$tmax))/nrow(nynoaa_tidy)
+```
+
+    ## [1] 0.4371025
+
+``` r
+sum(is.na(nynoaa_tidy$tmin))/nrow(nynoaa_tidy)
+```
+
+    ## [1] 0.4371264
+
+This dataset has 2595176 rows and 9 columns. It starts from 1981-01-01
+to 2010-12-31, containing the weather infomation of these days,
+including prcp, snow, snwd, tmax, and tmin. In tmax and tmin, the
+proportion of missing value is up to 43%, which is very high.
+
+## Snow data
+
+``` r
+nynoaa_tidy %>% 
+  count(snow, na.rm = T) %>% 
+  mutate(rank = min_rank(desc(n)))
+```
+
+    ## # A tibble: 282 x 4
+    ##     snow na.rm       n  rank
+    ##    <dbl> <lgl>   <int> <int>
+    ##  1   -13 TRUE        1   238
+    ##  2     0 TRUE  2008508     1
+    ##  3     3 TRUE     8790    10
+    ##  4     5 TRUE     9748     8
+    ##  5     8 TRUE     9962     7
+    ##  6    10 TRUE     5106    12
+    ##  7    13 TRUE    23095     4
+    ##  8    15 TRUE     3672    16
+    ##  9    18 TRUE     3226    17
+    ## 10    20 TRUE     4797    13
+    ## # … with 272 more rows
+
+The most commonly observed value is 0 for snow, since usually there is
+no snow.
+
+## Make a two-panel plot showing the average max temperature in January and in July in each station across years
+
+``` r
+nynoaa_tidy %>% 
+  filter(month == 'January') %>% 
+  group_by(id,month,year) %>% 
+  summarise(max_mean = mean(tmax, na.rm = TRUE),.groups = 'drop') %>% 
+  drop_na() %>% 
+  ggplot(aes(x = year, y = max_mean, color = id)) +
+  geom_point(alpha = 0.3, size = 0.2) +
+  geom_path(aes(group = id), alpha = 0.3, size = 0.2)
+```
+
+<img src="hw3_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+
+``` r
+nynoaa_tidy %>% filter(id == 'US1NYAB0001',month == "January", year == "2008")
+```
+
+    ## # A tibble: 31 x 9
+    ##    id          year  month   day    prcp  snow  snwd  tmax  tmin
+    ##    <chr>       <chr> <chr>   <chr> <dbl> <dbl> <int> <dbl> <dbl>
+    ##  1 US1NYAB0001 2008  January 01        0     0   343    NA    NA
+    ##  2 US1NYAB0001 2008  January 02       86   109   445    NA    NA
+    ##  3 US1NYAB0001 2008  January 03        0     0   432    NA    NA
+    ##  4 US1NYAB0001 2008  January 04        0     0    NA    NA    NA
+    ##  5 US1NYAB0001 2008  January 05        0     0   305    NA    NA
+    ##  6 US1NYAB0001 2008  January 06        0     0   267    NA    NA
+    ##  7 US1NYAB0001 2008  January 07        0     0   191    NA    NA
+    ##  8 US1NYAB0001 2008  January 08        0     0    89    NA    NA
+    ##  9 US1NYAB0001 2008  January 09        0     0    38    NA    NA
+    ## 10 US1NYAB0001 2008  January 10        0     0     0    NA    NA
+    ## # … with 21 more rows

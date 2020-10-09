@@ -169,18 +169,17 @@ nynoaa_tidy = ny_noaa %>%
   separate(date, into = c("year", "month", "day"), sep = "-") %>% 
   mutate_at(vars(month),as.numeric) %>% 
   mutate(month = month.name[month])
-
-nynoaa
+skimr::skim_without_charts(nynoaa_tidy)
 ```
 ```{r}
-sum(is.na(nynoaa$prcp))/nrow(nynoaa)
-sum(is.na(nynoaa$snow))/nrow(nynoaa)
-sum(is.na(nynoaa$snwd))/nrow(nynoaa)
-sum(is.na(nynoaa$tmax))/nrow(nynoaa)
-sum(is.na(nynoaa$tmin))/nrow(nynoaa)
+sum(is.na(nynoaa_tidy$prcp))/nrow(nynoaa_tidy)
+sum(is.na(nynoaa_tidy$snow))/nrow(nynoaa_tidy)
+sum(is.na(nynoaa_tidy$snwd))/nrow(nynoaa_tidy)
+sum(is.na(nynoaa_tidy$tmax))/nrow(nynoaa_tidy)
+sum(is.na(nynoaa_tidy$tmin))/nrow(nynoaa_tidy)
 ```
 
-This dataset has `r nrow(nynoaa)` rows and `r ncol(nynoaa)` columns. It starts from 1981-01-01 to 2010-12-31, containing the weather infomation of these days, including prcp, snow, snwd, tmax, and tmin. In tmax and tmin, the proportion of missing value is up to 43%, which is very high.
+This dataset has `r nrow(nynoaa_tidy)` rows and `r ncol(nynoaa_tidy)` columns. It starts from 1981-01-01 to 2010-12-31, containing the weather infomation of these days, including prcp, snow, snwd, tmax, and tmin. In tmax and tmin, the proportion of missing value is up to 43%, which is very high.
 
 ## Snow data
 ```{r}
@@ -191,10 +190,66 @@ nynoaa_tidy %>%
 The most commonly observed value is 0 for snow, since usually there is no snow.
 
 ## Make a two-panel plot showing the average max temperature in January and in July in each station across years
+
+###January
+```{r}
+january=
+nynoaa_tidy %>% 
+  filter(month == 'January') %>% 
+  group_by(id,month,year) %>% 
+  summarise(max_mean = mean(tmax, na.rm = TRUE),.groups = 'drop') %>% 
+  drop_na() %>% 
+  ggplot(aes(x = year,
+             y = max_mean,
+             color = id,
+             group = id))+
+  geom_point(alpha = 0.3)+
+  geom_path(alpha = 0.3)+
+  theme(legend.position = 'none',
+        axis.title.x = element_blank())+
+  labs(
+    x = "Year",
+    y = "Temperature",
+    title = "Maximun temperature in January of each years"
+    )
+
+
+
+```
+###July
+```{r}
+july=
+nynoaa_tidy %>% 
+  filter(month == 'July') %>% 
+  group_by(id,month,year) %>% 
+  summarise(max_mean = mean(tmax, na.rm = TRUE),.groups = 'drop') %>% 
+  drop_na() %>% 
+  ggplot(aes(x = year,
+             y = max_mean,
+             color = id,
+             group = id))+
+  geom_point(alpha = 0.3)+
+  geom_path(alpha = 0.3)+
+  theme(legend.position = 'none',
+        axis.title.x = element_blank())+
+  labs(
+    x = "Year",
+    y = "Temperature",
+    title = "Maximun temperature in July of each years"
+    )
+```
+
+```{r}
+january/july
+```
+* Overall temperature in July is higher than in January in NYC. Temperature in January is around -100 to 100, and in July, it is from around 200 to 300.
+* There are many outliers for both datasets. For example, 1982 and 2005 had much lower temperature on January, 1988 had much lower temperature on July.
+
+##Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option)
+
 ```{r}
 
 ```
-
 
 
 
