@@ -102,3 +102,75 @@ instacart %>%
     ##   <chr>            <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
     ## 1 Coffee Ice Cream  13.8  14.3  15.4  15.3  15.2  12.3  13.8
     ## 2 Pink Lady Apples  13.4  11.4  11.7  14.2  11.6  12.8  11.9
+
+# Problem 2
+
+\#\#load and clean data
+
+``` r
+accel = 
+  read_csv("./data/accel_data.csv") %>% 
+  janitor::clean_names() %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "minute",
+    names_prefix = "activity_",
+    values_to = "number_of_activity") %>% 
+  drop_na("number_of_activity") %>% 
+  mutate(
+    minute = as.numeric(minute),
+    number_of_activity = as.numeric(number_of_activity),
+    week = as.character(week),
+    day = as.factor(day),
+    day_id = as.factor(day_id) 
+  ) %>% 
+  mutate(weekend = day %in% c("Sunday","Saturday"),
+         weekday = day %in% c("Monday","Tuesday", "Wednesday","Thursday","Friday"),
+         weekend_vs_weekday=
+           case_when(weekend ~"weekend",
+                     weekday ~ "weekday")) %>% 
+  mutate(weekend_vs_weekday = as.factor(weekend_vs_weekday),
+         day = forcats::fct_relevel(day,c("Monday","Tuesday","Wednesday","Thursday",
+                                     "Friday", "Saturday","Sunday"))) %>% 
+  group_by(week) %>% 
+  arrange(day,.by_group = T) %>% 
+  relocate(day_id, week, weekend_vs_weekday)
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_double(),
+    ##   day = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+``` r
+accel
+```
+
+    ## # A tibble: 50,400 x 8
+    ## # Groups:   week [5]
+    ##    day_id week  weekend_vs_weekd… day    minute number_of_activ… weekend weekday
+    ##    <fct>  <chr> <fct>             <fct>   <dbl>            <dbl> <lgl>   <lgl>  
+    ##  1 2      1     weekday           Monday      1                1 FALSE   TRUE   
+    ##  2 2      1     weekday           Monday      2                1 FALSE   TRUE   
+    ##  3 2      1     weekday           Monday      3                1 FALSE   TRUE   
+    ##  4 2      1     weekday           Monday      4                1 FALSE   TRUE   
+    ##  5 2      1     weekday           Monday      5                1 FALSE   TRUE   
+    ##  6 2      1     weekday           Monday      6                1 FALSE   TRUE   
+    ##  7 2      1     weekday           Monday      7                1 FALSE   TRUE   
+    ##  8 2      1     weekday           Monday      8                1 FALSE   TRUE   
+    ##  9 2      1     weekday           Monday      9                1 FALSE   TRUE   
+    ## 10 2      1     weekday           Monday     10                1 FALSE   TRUE   
+    ## # … with 50,390 more rows
+
+First, we read data from “accel\_data.csv” and clean it. Since the data
+in the excel is in a format that hard to read, I used pivot\_longer and
+count the number of activities of different time length. And then drop
+null values and mutate the format of some variables for calculation.
+Then we create weekend\_vs\_weekday column. The last step is to group,
+relocate the data and make it more readable. Finally, this dataset has
+50400 rows and 8 columns, with variables day\_id, week,
+weekend\_vs\_weekday, day, minute, number\_of\_activity, weekend,
+weekday.

@@ -89,8 +89,39 @@ instacart %>%
 ##load and clean data
 
 ```{r}
-accelerometer = read_csv("./data/accel_data.csv")
+accel = 
+  read_csv("./data/accel_data.csv") %>% 
+  janitor::clean_names() %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "minute",
+    names_prefix = "activity_",
+    values_to = "number_of_activity") %>% 
+  drop_na("number_of_activity") %>% 
+  mutate(
+    minute = as.numeric(minute),
+    number_of_activity = as.numeric(number_of_activity),
+    week = as.character(week),
+    day = as.factor(day),
+    day_id = as.factor(day_id) 
+  ) %>% 
+  mutate(weekend = day %in% c("Sunday","Saturday"),
+         weekday = day %in% c("Monday","Tuesday", "Wednesday","Thursday","Friday"),
+         weekend_vs_weekday=
+           case_when(weekend ~"weekend",
+                     weekday ~ "weekday")) %>% 
+  mutate(weekend_vs_weekday = as.factor(weekend_vs_weekday),
+         day = forcats::fct_relevel(day,c("Monday","Tuesday","Wednesday","Thursday",
+                                     "Friday", "Saturday","Sunday"))) %>% 
+  group_by(week) %>% 
+  arrange(day,.by_group = T) %>% 
+  relocate(day_id, week, weekend_vs_weekday)
+
+accel
 ```
+First, we read data from "accel_data.csv" and clean it. Since the data in the excel is in a format that hard to read, I used pivot_longer and count the number of activities of different time length. And then drop null values and mutate the format of some variables for calculation. Then we create weekend_vs_weekday column. The last step is to group, relocate the data and make it more readable. Finally, this dataset has `r nrow(accel)` rows and `r ncol(accel)` columns, with variables day_id, week, weekend_vs_weekday, day, minute, number_of_activity, weekend, weekday.
+
+
 
 
 
