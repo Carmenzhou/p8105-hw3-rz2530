@@ -248,7 +248,23 @@ january/july
 ##Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option)
 
 ```{r}
+tmax_vs_tmin = 
+  nynoaa_tidy %>% 
+  drop_na(tmax, tmin) %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "tmax_vs_tmin",
+    values_to = "temperature"
+  ) %>% 
+  ggplot(aes(x = year, y = temperature)) +
+  geom_boxplot(aes(color = tmax_vs_tmin), alpha = 0.3)+
 
+  labs(
+    x = "Year",
+    y = "Temperature",
+    title = "tmax vs tmin"
+    )
+tmax_vs_tmin
 ```
 
 
